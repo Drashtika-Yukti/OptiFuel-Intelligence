@@ -46,10 +46,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # --- Fix: Convert Repository Name to Lowercase ---
-      - name: Lowercase the repo name and owner
+      # --- Reliable Fix: Use Step Outputs ---
+      - name: Generate Lowercase Image Name
+        id: prep
         run: |
-          echo "IMAGE_ID=ghcr.io/${{ github.repository_owner }}/optifuel-intelligence" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "image_id=ghcr.io/${OWNER_LC}/optifuel-intelligence" >> $GITHUB_OUTPUT
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
@@ -57,5 +59,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.IMAGE_ID }}:latest
-            ${{ env.IMAGE_ID }}:${{ github.sha }}
+            ${{ steps.prep.outputs.image_id }}:latest
+            ${{ steps.prep.outputs.image_id }}:${{ github.sha }}
