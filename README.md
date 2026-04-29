@@ -16,18 +16,14 @@ pip install -r requirements.txt
 
 ## Running the Application
 
-**1. Start the Backend API:**
 ```bash
-# From the project root
-python -m uvicorn src.main:app --host 127.0.0.1 --port 8000
+# Start the unified server (API + Dashboard)
+python -m src.main
 ```
 
-**2. Start the Frontend Dashboard:**
-```bash
-# In a new terminal
-python serve_frontend.py
-```
-Then visit `http://localhost:5000` in your browser.
+Once started, access:
+- **Dashboard**: [http://localhost:8000](http://localhost:8000)
+- **API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## Usage
 

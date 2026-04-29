@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from .utils import SpatialIndex, get_route, geocode, logger, FuelOptimizerError, GeocodingError, RoutingError
@@ -19,6 +20,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- Professional Static File Serving ---
+FRONTEND_PATH = os.path.join(os.path.dirname(__file__), "..", "frontend")
+
+@app.get("/")
+async def serve_dashboard():
+    return FileResponse(os.path.join(FRONTEND_PATH, "index.html"))
+
+# Mount the rest of the frontend files (app.js, etc.)
+app.mount("/frontend", StaticFiles(directory=FRONTEND_PATH), name="frontend")
 
 # Initialize spatial index
 CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "fuel-prices.csv")
