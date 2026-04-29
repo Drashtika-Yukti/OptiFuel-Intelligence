@@ -14,12 +14,20 @@ This API calculates the most cost-effective fuel stops for a vehicle traveling b
 pip install -r requirements.txt
 ```
 
-## Running the API
+## Running the Application
 
+**1. Start the Backend API:**
 ```bash
 # From the project root
-python -m src.main
+python -m uvicorn src.main:app --host 127.0.0.1 --port 8000
 ```
+
+**2. Start the Frontend Dashboard:**
+```bash
+# In a new terminal
+python serve_frontend.py
+```
+Then visit `http://localhost:5000` in your browser.
 
 ## Usage
 
