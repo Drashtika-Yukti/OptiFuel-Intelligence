@@ -2,15 +2,15 @@ import heapq
 from .utils import haversine, SpatialIndex
 import polyline
 
-def optimize_fuel_stops(route_data, spatial_index, max_range=500, mpg=10):
+def optimize_fuel_stops(route_data, spatial_index, fuel_capacity=500, mpg=10, reserve_miles=50):
     """
-    Finds optimal fuel stops along a route.
+    Finds optimal fuel stops along a route with dynamic vehicle profiles.
     """
     points = polyline.decode(route_data['geometry'])
     total_dist = route_data['distance'] * 0.000621371  # Convert meters to miles
     
     # 1. Sample the route to find candidate stations
-    # We take a point every ~100 miles to search for stations
+    # We take a point every ~50 miles to search for stations
     candidates = []
     accumulated_dist = 0
     last_pt = points[0]
@@ -59,29 +59,21 @@ def optimize_fuel_stops(route_data, spatial_index, max_range=500, mpg=10):
     })
 
     # 2. Build adjacency list for Dijkstra
-    # Each node can reach any node further down the route if within max_range
+    # Each node can reach any node further down the route if within (fuel_capacity - reserve_miles)
+    effective_range = fuel_capacity - reserve_miles
+    
     adj = [[] for _ in range(len(candidates))]
     for i in range(len(candidates)):
         for j in range(i + 1, len(candidates)):
-            # Direct distance check (heuristic)
-            d = haversine(candidates[i]['lat'], candidates[i]['lon'], 
-                          candidates[j]['lat'], candidates[j]['lon'])
-            
-            # Distance along the route check (more accurate)
+            # Distance along the route check
             route_dist = candidates[j]['dist_from_start'] - candidates[i]['dist_from_start']
             
-            if route_dist <= max_range:
-                # Cost to get from i to j is (route_dist / mpg) * price at i
-                # However, you fill up at i to reach j.
-                # If i is START, price is 0 (assume full tank or we don't care yet)
-                # If j is FINISH, we just need to reach it.
+            if route_dist <= effective_range:
                 gallons = route_dist / mpg
                 cost = gallons * candidates[i]['price']
                 adj[i].append((j, cost))
             else:
-                # Since candidates are sorted by dist_from_start, we can break early
-                # if route_dist is too large
-                if route_dist > max_range + 50: # small buffer for non-linearity
+                if route_dist > fuel_capacity: # Hard limit
                      break
 
     # 3. Run Dijkstra

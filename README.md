@@ -1,4 +1,4 @@
-# Fuel Stop Optimizer API
+# OptiFuel Intelligence
 
 This API calculates the most cost-effective fuel stops for a vehicle traveling between two locations in the USA.
 

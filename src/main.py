@@ -7,8 +7,8 @@ import os
 import time
 
 app = FastAPI(
-    title="Fuel Stop Optimizer API",
-    description="Professional-grade API for fuel stop planning across the USA."
+    title="OptiFuel Intelligence API",
+    description="Strategic fuel stop optimization for enterprise logistics."
 )
 
 # Initialize spatial index
@@ -23,6 +23,9 @@ except Exception as e:
 class RouteRequest(BaseModel):
     start: str = Field(..., example="New York, NY")
     finish: str = Field(..., example="Los Angeles, CA")
+    mpg: float = Field(default=10.0, gt=0, description="Miles per gallon")
+    fuel_capacity: float = Field(default=500.0, gt=0, description="Maximum range in miles")
+    reserve_miles: float = Field(default=50.0, ge=0, description="Safety buffer in miles")
 
 # --- Professional Error Handlers ---
 
@@ -61,7 +64,13 @@ async def plan_route(request: RouteRequest):
     route_data = get_route(start_coords, end_coords)
     
     # 3. Optimize fuel stops
-    result = optimize_fuel_stops(route_data, spatial_index)
+    result = optimize_fuel_stops(
+        route_data, 
+        spatial_index, 
+        fuel_capacity=request.fuel_capacity, 
+        mpg=request.mpg, 
+        reserve_miles=request.reserve_miles
+    )
     
     if not result:
         logger.error(f"No fuel path found for {request.start} to {request.finish}")
