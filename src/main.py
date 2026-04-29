@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from .utils import SpatialIndex, get_route, geocode, logger, FuelOptimizerError, GeocodingError, RoutingError
 from .optimizer import optimize_fuel_stops
@@ -9,6 +10,14 @@ import time
 app = FastAPI(
     title="OptiFuel Intelligence API",
     description="Strategic fuel stop optimization for enterprise logistics."
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Initialize spatial index
