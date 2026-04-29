@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.env
+.git/
+.gitignore
+tests/
+generate_complex_data.py
+generate_data.py
