@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# Grant permissions for GitHub Packages
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   test:
     name: Run Automated Tests
@@ -28,16 +33,24 @@ jobs:
           pytest tests/test_main.py
 
   docker:
-    name: Build Docker Image
+    name: Build & Push to GitHub Packages
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       
-      - name: Build Docker Image
-        run: |
-          docker build -t optifuel-intelligence:latest .
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Docker Image Check
-        run: |
-          docker images | grep optifuel-intelligence
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/optifuel-intelligence:latest
+            ghcr.io/${{ github.repository_owner }}/optifuel-intelligence:${{ github.sha }}

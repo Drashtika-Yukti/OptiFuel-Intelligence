@@ -1,5 +1,7 @@
 # OptiFuel Intelligence
 
+![CI/CD Status](https://github.com/Drashtika-Yukti/OptiFuel-Intelligence/actions/workflows/ci-cd.yml/badge.svg)
+
 This API calculates the most cost-effective fuel stops for a vehicle traveling between two locations in the USA.
 
 ## Features
